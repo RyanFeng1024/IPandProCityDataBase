@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>省市区三级联动</title>
+</head>
+<body>
+<form method="post" action="post.php">
+    <div id="area"></div>
+    <input type="submit" style="margin-top: 10px;">
+</form>
+<script src="jquery-2.1.3.min.js"></script>
+<script src="area.js"></script>
+<script>
+    $(function(){
+
+        add_select(0);
+
+        $('body').on('change', '#area select', function() {
+            var $me = $(this);
+            var $next = $me.next();
+            /**
+             * 如果下一级已经是当前所选地区的子地区，则不进行处理
+             */
+            if ($me.val() == $next.data('pid')) {
+                return;
+            }
+            $me.nextAll().remove();
+            add_select($me.val());
+        });
+
+        function add_select(pid) {
+            var area_names = area['name'+pid];
+            if (!area_names) {
+                return false;
+            }
+            var area_codes = area['code'+pid];
+            var $select = $('<select>');
+            $select.attr('name', 'area[]');
+            $select.data('pid', pid);
+            if (area_codes[0] != -1) {
+                area_names.unshift('请选择');
+                area_codes.unshift(-1);
+            }
+            for (var idx in area_codes) {
+                var $option = $('<option>');
+                $option.attr('value', area_codes[idx]);
+                $option.text(area_names[idx]);
+                $select.append($option);
+            }
+            $('#area').append($select);
+        };
+    });
+</script>
+</body>
+</html>
